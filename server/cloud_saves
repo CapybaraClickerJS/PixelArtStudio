@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "app": "PixelArt Studio",
+  "cloud_saves": {
+    "MinhaArte": {
+      "width": 32,
+      "height": 32,
+      "pixels": [
+        ["#FF0000", "#000000"]
+      ]
+    }
+  }
+}

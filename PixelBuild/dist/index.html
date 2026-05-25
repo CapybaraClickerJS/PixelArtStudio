@@ -1,0 +1,22 @@
+<!-- src/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PixelBuild</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🔥 PixelBuild rodando</h1>
+
+  <script src="main.js"></script>
+
+  <script>
+    // 💥 live reload estilo Vite
+    const ws = new EventSource("/__live_reload");
+
+    ws.onmessage = () => {
+      location.reload();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+# App WebView simples, sem regras extras por enquanto

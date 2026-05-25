@@ -1,0 +1,1 @@
+Pasta usada para cache offline do app.

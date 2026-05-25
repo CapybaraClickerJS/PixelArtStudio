@@ -1,0 +1,5 @@
+{
+  "engine": "canvas2d",
+  "gpuAcceleration": false,
+  "offlineRendering": true
+}

@@ -1,0 +1,6 @@
+{
+  "appName": "PixelArt Studio",
+  "offlineMode": true,
+  "renderEngine": "canvas2d",
+  "experimentalFeatures": false
+}

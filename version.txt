@@ -1,0 +1,4 @@
+PixelArt Studio
+Version: 1.0.0
+Build: Alpha
+Engine: JS Render Engine
