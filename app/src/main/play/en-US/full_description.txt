@@ -1,0 +1,13 @@
+PixelArtStudio is a lightweight, offline-first pixel art editor designed for Android. Create beautiful pixel art directly on your device with a clean, intuitive interface.
+
+Features:
+• Paint with pencil, eraser, bucket fill, and color picker tools
+• Undo/redo functionality
+• Zoom in and out
+• Import and export PNG images
+• Auto-save your work
+• Works offline
+• Dark mode interface
+• Works on any Android device (7.0+)
+
+Perfect for creating sprites, icons, small animations, and more. All your work is saved locally on your device.

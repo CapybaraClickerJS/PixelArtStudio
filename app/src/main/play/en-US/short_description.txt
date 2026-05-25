@@ -1,0 +1,1 @@
+Minimalist offline pixel art editor for Android
