@@ -6,13 +6,13 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
+
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="icon" href="assets/favicon/favicon.ico">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
-    
+
     <title>PixelArt Studio</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -109,7 +109,7 @@
     <div class="tool-bar">
         <div class="tool-btn" onclick="undo()" id="undoBtn" style="font-size:26px;">↩️</div>
         <div class="tool-btn" onclick="redo()" id="redoBtn" style="font-size:26px;">↪️</div>
-        
+
         <div class="tool-btn" onclick="zoomOut()" style="font-size:28px; font-weight:bold;">−</div>
         <div class="tool-btn" onclick="zoomIn()"  style="font-size:28px; font-weight:bold;">+</div>
 
@@ -117,13 +117,13 @@
         <div class="tool-btn" onclick="setTool(1)">🧼</div>
         <div class="tool-btn" onclick="setTool(3)">🎯</div>
         <div class="tool-btn" onclick="setTool(2)">🪣</div>
-        <div onclick="downloadImage()" style="font-size:22px; padding:0 10px; display:flex; align-items:center;">⬇️</div>
+        <div class="tool-btn" onclick="downloadImage()" style="font-size:22px;">⬇️</div>
     </div>
 
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h2>⚙️ Configurações</h2>
-            
+
             <label>Nome da Imagem</label>
             <input type="text" id="imageName" value="MinhaArte">
 
@@ -149,7 +149,7 @@
                 <div id="colorPreview" style="height:55px; border-radius:8px; margin:10px 0; background:#ff0000;"></div>
                 <div style="display:flex; gap:10px;">
                     <input type="color" id="colorPicker" value="#ff0000" style="width:70px;height:50px;padding:4px;">
-                    <input type="text" id="hexInput" value="#ff0000" maxlength="7" 
+                    <input type="text" id="hexInput" value="#ff0000" maxlength="7"
                            style="flex:1; padding:12px; background:#333; border:1px solid #555; border-radius:8px; color:white; font-family:monospace;">
                 </div>
             </div>
@@ -173,7 +173,7 @@
         const container = document.getElementById('canvasContainer');
         const STORAGE_KEY = 'pixelartstudio_offline_v3';
         const EMPTY_COLOR = '#000000';
-        
+
         let gridWidth = 32;
         let gridHeight = 32;
         let pixelSize = 12;
@@ -349,7 +349,7 @@
 
         async function downloadImage() {
             const name = sanitizeFileName(document.getElementById('imageName').value) || 'MinhaArte';
-            
+
             const temp = document.createElement('canvas');
             temp.width = gridWidth;
             temp.height = gridHeight;
@@ -367,15 +367,17 @@
                 }
             }
 
-            const blob = await new Promise(resolve => temp.toBlob(resolve, 'image/png'));
-            const link = document.createElement('a');
-            link.download = `${name}(${gridWidth}x${gridHeight}).png`;
-            link.href = URL.createObjectURL(blob);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-
-            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            temp.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${name}(${gridWidth}x${gridHeight}).png`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            }, 'image/png');
         }
 
         function resizeCanvas() {
@@ -471,12 +473,58 @@
         }
 
         function clearCanvas() {
-            if (confirm('Limpar tudo?')) {
+            const modalBg = document.createElement('div');
+            modalBg.style.cssText = `
+                position: fixed; top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: rgba(0,0,0,0.9); z-index: 2000;
+                display: flex; align-items: center; justify-content: center;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: #252525; padding: 25px; border-radius: 12px;
+                text-align: center; max-width: 300px;
+            `;
+
+            const title = document.createElement('h3');
+            title.textContent = '🗑️ Limpar Canvas?';
+            title.style.cssText = 'color: #fff; margin-bottom: 15px;';
+
+            const warning = document.createElement('p');
+            warning.textContent = 'Essa ação não pode ser desfeita!';
+            warning.style.cssText = 'color: #aaa; margin: 15px 0;';
+
+            const btnContainer = document.createElement('div');
+            btnContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 20px;';
+
+            const btnYes = document.createElement('button');
+            btnYes.textContent = 'Sim, limpar';
+            btnYes.style.cssText = 'background: #ff4444; padding: 12px 20px; flex: 1;';
+            btnYes.onclick = () => {
+                document.body.removeChild(modalBg);
                 saveHistory();
                 initPixels();
                 drawGrid();
                 scheduleSave();
-            }
+            };
+
+            const btnNo = document.createElement('button');
+            btnNo.textContent = 'Cancelar';
+            btnNo.style.cssText = 'background: #555; padding: 12px 20px; flex: 1;';
+            btnNo.onclick = () => {
+                document.body.removeChild(modalBg);
+            };
+
+            btnContainer.appendChild(btnYes);
+            btnContainer.appendChild(btnNo);
+
+            modalContent.appendChild(title);
+            modalContent.appendChild(warning);
+            modalContent.appendChild(btnContainer);
+
+            modalBg.appendChild(modalContent);
+            document.body.appendChild(modalBg);
         }
 
         function setTool(tool) {
@@ -518,6 +566,7 @@
                     border: 2px solid #666;
                     border-radius: 8px;
                     background: ${color};
+                    margin: 0;
                 `;
                 box.appendChild(btn);
             });
@@ -677,7 +726,7 @@
             pixelSize = Math.max(8, Math.floor(maxScreen / Math.max(gridWidth, gridHeight)));
             canvas.width = gridWidth * pixelSize;
             canvas.height = gridHeight * pixelSize;
-            
+
             setupEvents();
             setupColorPicker();
             updateBrushConstraints();
@@ -690,4 +739,4 @@
         };
     </script>
 </body>
-</html>
+</html> 
